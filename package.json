@@ -1,0 +1,42 @@
+{
+  "name": "oidbt-bangumi-app",
+  "version": "0.1.0",
+  "description": "Bangumi 组件 《OIDBT Bangumi App》",
+  "author": "op200",
+  "license": "Copyright op200",
+  "type": "module",
+  "main": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "packageManager": "pnpm@10.30.3",
+  "dependencies": {
+    "@bokuweb/zstd-wasm": "^0.0.27",
+    "helia": "^6.0.20",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.29"
+  },
+  "devDependencies": {
+    "@tsconfig/node24": "^24.0.4",
+    "@types/node": "^25.3.1",
+    "@vicons/carbon": "^0.13.0",
+    "@vicons/fluent": "^0.13.0",
+    "@vicons/ionicons5": "^0.13.0",
+    "@vitejs/plugin-vue": "^6.0.4",
+    "@vitejs/plugin-vue-jsx": "^5.1.4",
+    "@vue/tsconfig": "^0.8.1",
+    "naive-ui": "^2.43.2",
+    "npm-run-all2": "^8.0.4",
+    "prettier": "^3.8.1",
+    "terser": "^5.46.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-monkey": "^7.1.9",
+    "vite-plugin-vue-devtools": "^8.0.6",
+    "vue-tsc": "^3.2.5"
+  },
+  "engines": {
+    "node": ">=25.6.1"
+  }
+}
