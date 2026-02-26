@@ -16,7 +16,7 @@ export default defineConfig({
             entry: 'src/main.tsx',
             userscript: {
                 name: 'OIDBT Bangumi App',
-                namespace: 'https://github.com/op200/bangumi-new-ani-remind',
+                namespace: 'https://github.com/OIDBT/oidbt-bangumi-app',
                 match: [
                     '*://bgm.tv/subject/*',
                     '*://bangumi.tv/subject/*',
