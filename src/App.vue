@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import { usePreferredDark } from '@vueuse/core'
+import { darkTheme, NConfigProvider, NDialogProvider, NPopover } from 'naive-ui'
+import { storeToRefs } from 'pinia'
+import { onBeforeMount } from 'vue'
+
 import PopoverContent from '@/components/PopoverContent.vue'
 import { IPNS_ADDRESS, ROOT_PATH } from '@/global_val'
 import { log } from '@/log'
 import { useMainStore, type Oidbt_ipfs_bangumi } from '@/stores/mainStore'
-import { NPopover } from 'naive-ui'
-import { onBeforeMount } from 'vue'
-
 import { dezstd } from '@/utils'
-import { storeToRefs } from 'pinia'
+
+const is_dark = usePreferredDark()
 
 const mainStore = useMainStore()
 const { data_from_ipfsio } = storeToRefs(mainStore)
@@ -49,24 +52,44 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-    <n-popover
-        trigger="click"
-        placement="bottom"
-        style="
-            max-height: calc(90vh - 136px);
-            max-width: 70vw;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            padding: 0;
-        "
-    >
-        <template #trigger>
-            <a style="cursor: pointer">
-                <div>OIDBT</div>
-            </a>
-        </template>
-        <PopoverContent :ipfs_io_url="ipfs_io_url"></PopoverContent>
-    </n-popover>
+    <a style="cursor: pointer; padding: 0">
+        <n-config-provider :theme="is_dark ? darkTheme : null">
+            <n-popover
+                trigger="click"
+                placement="bottom"
+                style="padding: 0; max-width: 70vw"
+            >
+                <template #trigger>
+                    <div style="padding: 10px 10px 9px">OIDBT</div>
+                </template>
+                <n-dialog-provider>
+                    <PopoverContent :ipfs_io_url="ipfs_io_url" />
+                </n-dialog-provider>
+            </n-popover>
+        </n-config-provider>
+    </a>
 </template>
 
-<style scoped></style>
+<style scoped>
+a:hover span {
+    color: rgb(54, 156, 248) !important;
+}
+html[data-theme='light'] {
+    a span {
+        color: rgb(136, 136, 136);
+    }
+}
+html[data-theme='dark'] {
+    a span {
+        color: rgb(238, 238, 238);
+    }
+}
+</style>
+
+<style>
+/* Bangumi 的全局 css 会覆盖 input */
+.n-input__input-el {
+    box-shadow: none !important;
+    background-color: transparent !important;
+}
+</style>

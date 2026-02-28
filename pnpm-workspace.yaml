@@ -1,2 +1,6 @@
 ignoredBuiltDependencies:
   - iso-constants
+
+onlyBuiltDependencies:
+  - esbuild
+  - node-datachannel

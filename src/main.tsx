@@ -1,7 +1,8 @@
-import { log } from '@/log'
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
-import App from './App.vue'
+
+import App from '@/App.vue'
+import { log } from '@/log'
 
 async function run(): Promise<void> {
     const app = createApp(App)

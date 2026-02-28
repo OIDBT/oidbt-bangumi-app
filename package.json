@@ -1,6 +1,6 @@
 {
   "name": "oidbt-bangumi-app",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Bangumi 组件 《OIDBT Bangumi App》",
   "author": "op200",
   "license": "Copyright op200",
@@ -13,13 +13,14 @@
   "packageManager": "pnpm@10.30.3",
   "dependencies": {
     "@bokuweb/zstd-wasm": "^0.0.27",
+    "@vueuse/core": "^14.2.1",
     "helia": "^6.0.20",
     "pinia": "^3.0.4",
     "vue": "^3.5.29"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.4",
-    "@types/node": "^25.3.1",
+    "@types/node": "^25.3.2",
     "@vicons/carbon": "^0.13.0",
     "@vicons/fluent": "^0.13.0",
     "@vicons/ionicons5": "^0.13.0",
