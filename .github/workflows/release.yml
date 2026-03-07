@@ -5,7 +5,7 @@ on:
     types: [published]
 
 jobs:
-  build:
+  build-and-upload:
     runs-on: windows-latest
     permissions:
       contents: write # 需要写入权限才能上传到 release
