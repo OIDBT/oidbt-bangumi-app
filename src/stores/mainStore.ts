@@ -5,6 +5,7 @@ export interface Magnet_item {
     magnet: string
     source_link_set: string[]
     title_set: string[]
+    cid: string
 }
 
 export interface Oidbt_ipfs_bangumi {

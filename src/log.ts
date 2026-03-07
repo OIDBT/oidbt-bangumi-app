@@ -12,6 +12,9 @@ export namespace log {
     export function info(...data: any[]) {
         console.info(...log_head, ...data)
     }
+    export function log(...data: any[]) {
+        console.log(...log_head, ...data)
+    }
     export function error(...data: any[]) {
         console.error(...log_head, ...data)
     }

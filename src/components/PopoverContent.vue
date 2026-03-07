@@ -1,6 +1,10 @@
 <script setup lang="tsx">
 import { CopyLink } from '@vicons/carbon'
-import { CloudLink20Regular, Info20Regular } from '@vicons/fluent'
+import {
+    CloudLink20Regular,
+    Info20Regular,
+    Settings28Regular,
+} from '@vicons/fluent'
 import { MagnetOutline } from '@vicons/ionicons5'
 import {
     NA,
@@ -20,22 +24,28 @@ import {
 import { storeToRefs } from 'pinia'
 import { computed, ref, type StyleValue } from 'vue'
 
+import Setting from '@/components/Setting.vue'
 import { useMainStore } from '@/stores/mainStore'
+import { useSettingStore } from '@/stores/settingStore'
 
 const mainStore = useMainStore()
 const { data_from_ipfsio } = storeToRefs(mainStore)
+
+const settingStore = useSettingStore()
+const {} = storeToRefs(settingStore)
 
 const wd = window
 const nav = navigator
 
 const props = defineProps<{
-    ipfs_io_url: string
+    ipfs_io_url_list: string[]
 }>()
 
 interface Data_table_row {
     num: number
     title: string
     magnet: string
+    cid: string
 
     // 源数据引用
     source_link_set: string[]
@@ -45,10 +55,11 @@ interface Data_table_row {
 const data_table_data = computed<Data_table_row[]>(
     () =>
         data_from_ipfsio.value?.magnet_list.map<Data_table_row>(
-            ({ magnet, source_link_set, title_set }, i) => ({
+            ({ magnet, source_link_set, title_set, cid }, i) => ({
                 num: i + 1,
                 title: title_set[0] || '',
                 magnet: magnet,
+                cid: cid,
                 source_link_set: source_link_set,
                 title_set: title_set,
             })
@@ -77,13 +88,13 @@ const data_table_columns = computed<DataTableColumns<Data_table_row>>(() => [
         title: '',
         key: 'num',
         fixed: 'left',
-        width: `calc(${num_tag_width.value} + 15.6px)`,
+        width: `calc(${num_tag_width.value} + 14px + 24px)`,
         sorter: 'default',
         render(row) {
             return (
                 <NTag
                     style={{
-                        width: num_tag_width.value,
+                        width: `calc(${num_tag_width.value} + 14px)`,
                         justifyContent: 'space-around',
                     }}
                 >
@@ -195,6 +206,14 @@ const data_table_columns = computed<DataTableColumns<Data_table_row>>(() => [
                                             {link}
                                         </NA>
                                     ))}
+                                    <NA
+                                        {...({
+                                            href: `https://ipfs.io/ipfs/${row.cid}`,
+                                        } as any)}
+                                        v-show={row.cid}
+                                    >
+                                        https://ipfs.io/ipfs/{row.cid}
+                                    </NA>
                                 </NSpace>
                             ),
                         }}
@@ -220,16 +239,27 @@ const checked_row_keys = ref<number[]>([])
         v-else-if="data_from_ipfsio === null"
     >
         <n-text type="error">获取失败</n-text>
-        <n-tooltip trigger="hover" :delay="1500">
-            <template #trigger>
-                <a :href="ipfs_io_url" target="_blank">
-                    <n-button circle>
-                        <n-icon><CloudLink20Regular /></n-icon>
-                    </n-button>
-                </a>
-            </template>
-            从公共网关打开
-        </n-tooltip>
+        <n-flex>
+            <n-tooltip
+                trigger="hover"
+                :delay="1500"
+                :keep-alive-on-hover="false"
+                v-for="ipfs_io_url in ipfs_io_url_list"
+            >
+                <template #trigger>
+                    <a :href="ipfs_io_url" target="_blank">
+                        <n-button circle>
+                            <n-icon><CloudLink20Regular /></n-icon>
+                        </n-button>
+                    </a>
+                </template>
+                <span :style="styles.noselect">
+                    从公共网关打开
+                    <br />
+                    {{ ipfs_io_url }}
+                </span>
+            </n-tooltip>
+        </n-flex>
     </n-space>
     <div v-else>
         <div style="padding-top: 12px">
@@ -264,6 +294,19 @@ const checked_row_keys = ref<number[]>([])
                     </template>
                     <span :style="styles.noselect">复制所选磁链</span>
                 </n-tooltip>
+                <n-tooltip trigger="hover" :delay="1500">
+                    <template #trigger>
+                        <n-popover trigger="click" placement="bottom-end">
+                            <template #trigger>
+                                <n-button circle>
+                                    <n-icon><Settings28Regular /></n-icon>
+                                </n-button>
+                            </template>
+                            <Setting />
+                        </n-popover>
+                    </template>
+                    <span :style="styles.noselect">设置</span>
+                </n-tooltip>
             </n-flex>
         </div>
         <n-data-table
@@ -276,3 +319,9 @@ const checked_row_keys = ref<number[]>([])
         />
     </div>
 </template>
+
+<style>
+.v-vl {
+    overscroll-behavior: none;
+}
+</style>
