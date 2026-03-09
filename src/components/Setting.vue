@@ -1,5 +1,16 @@
 <script setup lang="ts">
-import { NButton, NFlex, NInput, NSpace, NSwitch, NText } from 'naive-ui'
+import { Settings28Regular } from '@vicons/fluent'
+import {
+    NButton,
+    NFlex,
+    NIcon,
+    NInput,
+    NPopover,
+    NSpace,
+    NSwitch,
+    NText,
+    NTooltip,
+} from 'naive-ui'
 import { storeToRefs } from 'pinia'
 import { onBeforeMount, ref } from 'vue'
 
@@ -32,25 +43,39 @@ onBeforeMount(cancel)
 </script>
 
 <template>
-    <n-space vertical style="min-width: calc(min(60em, 70vw))">
-        <n-switch v-model:value="input_helia_enable">
-            <template #checked>启用 Helia</template>
-            <template #unchecked>禁用 Helia</template>
-        </n-switch>
+    <n-tooltip trigger="hover" :delay="1500">
+        <template #trigger>
+            <n-popover trigger="click" placement="bottom-end">
+                <template #trigger>
+                    <n-button circle>
+                        <n-icon><Settings28Regular /></n-icon>
+                    </n-button>
+                </template>
+                <n-space vertical style="min-width: calc(min(60em, 70vw))">
+                    <n-switch v-model:value="input_helia_enable">
+                        <template #checked>启用 Helia</template>
+                        <template #unchecked>禁用 Helia</template>
+                    </n-switch>
 
-        <n-space vertical>
-            <n-text>添加额外信任源</n-text>
-            <n-input
-                type="textarea"
-                :placeholder="`每条一行，# 开头为注释\ne.g.\nipns://${bangumi_source_ipns_list[0]}\ntext://${BANGUMI_SOURCE_URL}`"
-                v-model:value="input_trusted_source"
-                :rows="5"
-            />
-        </n-space>
+                    <n-space vertical>
+                        <n-text>添加额外信任源</n-text>
+                        <n-input
+                            type="textarea"
+                            :placeholder="`每条一行，# 开头为注释\ne.g.\nipns://${bangumi_source_ipns_list[0]}\ntext://${BANGUMI_SOURCE_URL}`"
+                            v-model:value="input_trusted_source"
+                            :rows="5"
+                        />
+                    </n-space>
 
-        <n-flex justify="flex-end" align="center" :wrap="false">
-            <n-button type="success" secondary @click="save">保存</n-button>
-            <n-button secondary @click="cancel">取消</n-button>
-        </n-flex>
-    </n-space>
+                    <n-flex justify="flex-end" align="center" :wrap="false">
+                        <n-button type="success" secondary @click="save">
+                            保存
+                        </n-button>
+                        <n-button secondary @click="cancel">取消</n-button>
+                    </n-flex>
+                </n-space>
+            </n-popover>
+        </template>
+        <span style="user-select: none">设置</span>
+    </n-tooltip>
 </template>

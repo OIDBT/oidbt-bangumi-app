@@ -1,10 +1,6 @@
 <script setup lang="tsx">
 import { CopyLink } from '@vicons/carbon'
-import {
-    CloudLink20Regular,
-    Info20Regular,
-    Settings28Regular,
-} from '@vicons/fluent'
+import { CloudLink20Regular, Info20Regular } from '@vicons/fluent'
 import { MagnetOutline } from '@vicons/ionicons5'
 import {
     NA,
@@ -26,13 +22,9 @@ import { computed, ref, type StyleValue } from 'vue'
 
 import Setting from '@/components/Setting.vue'
 import { useMainStore } from '@/stores/mainStore'
-import { useSettingStore } from '@/stores/settingStore'
 
 const mainStore = useMainStore()
 const { data_from_ipfsio } = storeToRefs(mainStore)
-
-const settingStore = useSettingStore()
-const {} = storeToRefs(settingStore)
 
 const wd = window
 const nav = navigator
@@ -229,17 +221,23 @@ const checked_row_keys = ref<number[]>([])
 </script>
 
 <template>
-    <n-spin
-        style="padding: 2rem"
+    <n-space
+        vertical
+        style="padding: 1rem"
         v-if="data_from_ipfsio === undefined"
-    ></n-spin>
+    >
+        <n-flex justify="center">
+            <Setting />
+        </n-flex>
+        <n-spin style="padding: 1rem" size="large"></n-spin>
+    </n-space>
     <n-space
         align="center"
         style="padding: 0.8rem 1.6rem"
         v-else-if="data_from_ipfsio === null"
     >
         <n-text type="error">获取失败</n-text>
-        <n-flex>
+        <n-flex justify="center">
             <n-tooltip
                 trigger="hover"
                 :delay="1500"
@@ -259,6 +257,7 @@ const checked_row_keys = ref<number[]>([])
                     {{ ipfs_io_url }}
                 </span>
             </n-tooltip>
+            <Setting />
         </n-flex>
     </n-space>
     <div v-else>
@@ -294,19 +293,7 @@ const checked_row_keys = ref<number[]>([])
                     </template>
                     <span :style="styles.noselect">复制所选磁链</span>
                 </n-tooltip>
-                <n-tooltip trigger="hover" :delay="1500">
-                    <template #trigger>
-                        <n-popover trigger="click" placement="bottom-end">
-                            <template #trigger>
-                                <n-button circle>
-                                    <n-icon><Settings28Regular /></n-icon>
-                                </n-button>
-                            </template>
-                            <Setting />
-                        </n-popover>
-                    </template>
-                    <span :style="styles.noselect">设置</span>
-                </n-tooltip>
+                <Setting />
             </n-flex>
         </div>
         <n-data-table

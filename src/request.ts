@@ -9,29 +9,28 @@ export async function get_bangumi_data_from_ipns(
     try {
         log.debug('get_bangumi_data_from_ipns', url)
 
-        let compressedBuffer: ArrayBuffer | null
+        // 提前请求 HTTP
+        const response_promise = fetch(url, {
+            signal: new AbortController().signal,
+        })
+
+        let compressedBuffer: ArrayBuffer | null = null
         if (helia) {
             compressedBuffer = await get_ipns_file(url.split('/ipns/')[1])
-            if (compressedBuffer === null) {
-                log.warn('从 get_ipns_file 获取的数据为 null')
-                return null
-            }
-        } else {
-            const response = await fetch(url, {
-                signal: new AbortController().signal,
-            })
-
-            if (!response.ok) {
+            if (compressedBuffer === null)
+                log.warn('从 helia.get_ipns_file 获取的数据为 null')
+        }
+        if (compressedBuffer === null) {
+            const response = await response_promise
+            if (!response.ok)
                 throw new Error(`${response.status} ${response.statusText}`)
-            }
 
-            log.debug('获取 IPNS 内容:', response)
+            log.debug('HTTP 获取 IPNS 内容:', response)
 
             compressedBuffer = await response.arrayBuffer()
         }
 
         log.debug('获取到压缩数据，大小:', compressedBuffer.byteLength, 'bytes')
-
         const decompressedBuffer = await dezstd(
             new Uint8Array(compressedBuffer)
         )
@@ -53,11 +52,13 @@ export async function get_bangumi_data_from_ipns_list(
     url_list: string[]
 ): Promise<Oidbt_ipfs_bangumi | null> {
     await start_helia_node()
+    helia?.start()
     const data_list = (
         await Promise.all(
             url_list.map(async url => await get_bangumi_data_from_ipns(url))
         )
     ).filter(v => v != null)
+    helia?.stop()
 
     if (data_list.length === 0) return null
 

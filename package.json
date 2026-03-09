@@ -1,6 +1,6 @@
 {
   "name": "oidbt-bangumi-app",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Bangumi 组件 《OIDBT Bangumi App》",
   "author": "op200",
   "license": "Copyright op200",
@@ -18,7 +18,9 @@
     "@libp2p/peer-id": "^6.0.4",
     "@libp2p/websockets": "^10.1.5",
     "@vueuse/core": "^14.2.1",
+    "blockstore-idb": "^3.0.1",
     "buffer": "^6.0.3",
+    "datastore-idb": "^4.0.1",
     "helia": "^6.0.21",
     "multiformats": "^13.4.2",
     "pinia": "^3.0.4",
