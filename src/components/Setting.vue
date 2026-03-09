@@ -1,23 +1,30 @@
 <script setup lang="ts">
-import { NButton, NFlex, NInput, NSpace, NText } from 'naive-ui'
-
+import { NButton, NFlex, NInput, NSpace, NSwitch, NText } from 'naive-ui'
 import { storeToRefs } from 'pinia'
-
-import { IPNS_ADDRESS_LIST } from '@/global_val'
-import { useSettingStore } from '@/stores/settingStore'
 import { onBeforeMount, ref } from 'vue'
 
-const settingStore = useSettingStore()
-const { trusted_source } = storeToRefs(settingStore)
+import { BANGUMI_SOURCE_URL } from '@/global_val'
+import { useMainStore } from '@/stores/mainStore'
+import { useSettingStore } from '@/stores/settingStore'
 
+const mainStore = useMainStore()
+const { bangumi_source_ipns_list } = storeToRefs(mainStore)
+
+const settingStore = useSettingStore()
+const { helia_enable, trusted_source } = storeToRefs(settingStore)
+
+const input_helia_enable = ref<boolean>(true)
 const input_trusted_source = ref<string>('')
 
 /**写入变量 */
 function save() {
+    helia_enable.value = input_helia_enable.value
     trusted_source.value = input_trusted_source.value
 }
 /**还原变量 */
 function cancel() {
+    if (helia_enable.value !== undefined)
+        input_helia_enable.value = helia_enable.value
     if (trusted_source.value !== undefined)
         input_trusted_source.value = trusted_source.value
 }
@@ -26,11 +33,16 @@ onBeforeMount(cancel)
 
 <template>
     <n-space vertical style="min-width: calc(min(60em, 70vw))">
+        <n-switch v-model:value="input_helia_enable">
+            <template #checked>启用 Helia</template>
+            <template #unchecked>禁用 Helia</template>
+        </n-switch>
+
         <n-space vertical>
             <n-text>添加额外信任源</n-text>
             <n-input
                 type="textarea"
-                :placeholder="`每条一行，# 开头为注释\ne.g.\nipns://${IPNS_ADDRESS_LIST[0]}`"
+                :placeholder="`每条一行，# 开头为注释\ne.g.\nipns://${bangumi_source_ipns_list[0]}\ntext://${BANGUMI_SOURCE_URL}`"
                 v-model:value="input_trusted_source"
                 :rows="5"
             />

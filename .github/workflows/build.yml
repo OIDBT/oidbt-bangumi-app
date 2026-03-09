@@ -1,4 +1,4 @@
-name: Windows pnpm Build
+name: Build
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    name: pnpm Build - Windows
     runs-on: windows-latest
 
     steps:

@@ -1,6 +1,6 @@
 {
   "name": "oidbt-bangumi-app",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Bangumi 组件 《OIDBT Bangumi App》",
   "author": "op200",
   "license": "Copyright op200",
@@ -10,11 +10,17 @@
     "dev": "vite",
     "build": "vite build"
   },
-  "packageManager": "pnpm@10.30.3",
+  "packageManager": "pnpm@10.31.0",
   "dependencies": {
     "@bokuweb/zstd-wasm": "^0.0.27",
+    "@helia/ipns": "^9.1.9",
+    "@helia/unixfs": "^7.0.4",
+    "@libp2p/peer-id": "^6.0.4",
+    "@libp2p/websockets": "^10.1.5",
     "@vueuse/core": "^14.2.1",
+    "buffer": "^6.0.3",
     "helia": "^6.0.21",
+    "multiformats": "^13.4.2",
     "pinia": "^3.0.4",
     "vue": "^3.5.29"
   },
@@ -27,7 +33,7 @@
     "@vitejs/plugin-vue": "^6.0.4",
     "@vitejs/plugin-vue-jsx": "^5.1.4",
     "@vue/tsconfig": "^0.9.0",
-    "naive-ui": "^2.43.2",
+    "naive-ui": "^2.44.1",
     "npm-run-all2": "^8.0.4",
     "prettier": "^3.8.1",
     "terser": "^5.46.0",

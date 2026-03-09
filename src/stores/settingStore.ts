@@ -1,35 +1,70 @@
 import { log } from '@/log'
-import { setting_store } from '@/store'
+import { setting_db } from '@/stores/database'
+import { get_trusted_source_list_from_head } from '@/utils'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 
 export const useSettingStore = defineStore('setting', () => {
+    // Helia 设置
+    const helia_enable = ref<boolean | undefined>(undefined)
+    setting_db
+        .get('helia_enable')
+        .then(v => {
+            helia_enable.value = v?.value ?? true
+            watch(helia_enable, async () =>
+                setting_db.set('helia_enable', helia_enable.value)
+            )
+        })
+        .catch(e => log.error(e))
+
+    // 可信源设置
     const trusted_source = ref<string>('')
-    setting_store
+    setting_db
         .get('trusted_source')
         .then(v => {
             trusted_source.value = v?.value ?? ''
             watch(trusted_source, async () =>
-                setting_store.set('trusted_source', trusted_source.value)
+                setting_db.set('trusted_source', trusted_source.value)
             )
         })
         .catch(e => log.error(e))
+
     const trusted_source_lines = computed<string[]>(() =>
         trusted_source.value.split('\n').filter(line => {
             line = line.trim()
             return !(line.length === 0 || line.startsWith('#'))
         })
     )
-    function get_trusted_source_list_from_head(head: string) {
-        const regex = new RegExp(`^${head}(.+)`)
-        return () =>
-            trusted_source_lines.value
-                .map(line => (line.match(regex) || [])[1] || null)
-                .filter(v => v != null)
-    }
-    const trusted_source_ipns_list = computed<string[]>(
-        get_trusted_source_list_from_head('ipns://')
-    )
 
-    return { trusted_source, trusted_source_ipns_list }
+    const trusted_source_ipns_list = ref<string[]>([])
+    watch(trusted_source_lines, async () => {
+        trusted_source_ipns_list.value = [
+            ...get_trusted_source_list_from_head(
+                trusted_source_lines.value,
+                'ipns://'
+            ),
+            ...(
+                await Promise.all(
+                    get_trusted_source_list_from_head(
+                        trusted_source_lines.value,
+                        'text://'
+                    ).map(async url => {
+                        try {
+                            const response = await fetch(url)
+                            if (!response.ok)
+                                throw new Error(
+                                    `状态码错误: ${response.status}`
+                                )
+                            return response.text()
+                        } catch (e) {
+                            log.error('请求失败', url, e)
+                            return null
+                        }
+                    })
+                )
+            ).filter(v => v !== null),
+        ]
+    })
+
+    return { helia_enable, trusted_source, trusted_source_ipns_list }
 })

@@ -5,7 +5,6 @@ import { storeToRefs } from 'pinia'
 import { computed, onBeforeMount, watch } from 'vue'
 
 import PopoverContent from '@/components/PopoverContent.vue'
-import { IPNS_ADDRESS_LIST } from '@/global_val'
 import { get_bangumi_data_from_ipns_list } from '@/request'
 import { useMainStore } from '@/stores/mainStore'
 import { useSettingStore } from '@/stores/settingStore'
@@ -13,27 +12,30 @@ import { useSettingStore } from '@/stores/settingStore'
 const is_dark = usePreferredDark()
 
 const mainStore = useMainStore()
-const { data_from_ipfsio } = storeToRefs(mainStore)
+const { data_from_ipfsio, bangumi_source_ipns_list } = storeToRefs(mainStore)
 
 const settingStore = useSettingStore()
 const { trusted_source_ipns_list } = storeToRefs(settingStore)
 
 const ipfs_io_url_list = computed<string[]>(() => [
     ...new Set(
-        [...IPNS_ADDRESS_LIST, ...trusted_source_ipns_list.value].map(
+        [
+            ...bangumi_source_ipns_list.value,
+            ...trusted_source_ipns_list.value,
+        ].map(
             v =>
                 `https://ipfs.io/ipns/${v}${window.location.pathname.split('/').at(-1)}`
         )
     ),
 ])
 
-async function update_data_from_ipfsio() {
+async function update_data() {
     data_from_ipfsio.value = await get_bangumi_data_from_ipns_list(
         ipfs_io_url_list.value
     )
 }
-watch(ipfs_io_url_list, update_data_from_ipfsio)
-onBeforeMount(update_data_from_ipfsio)
+watch(ipfs_io_url_list, update_data)
+onBeforeMount(update_data)
 </script>
 
 <template>

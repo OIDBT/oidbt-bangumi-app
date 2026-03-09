@@ -1,6 +1,7 @@
 import { log } from '@/log'
 import type { Magnet_item, Oidbt_ipfs_bangumi } from '@/stores/mainStore'
 import { dezstd } from '@/utils'
+import { get_ipns_file, helia, start_helia_node } from '@/helia'
 
 export async function get_bangumi_data_from_ipns(
     url: string
@@ -8,17 +9,27 @@ export async function get_bangumi_data_from_ipns(
     try {
         log.debug('get_bangumi_data_from_ipns', url)
 
-        const response = await fetch(url, {
-            signal: new AbortController().signal,
-        })
+        let compressedBuffer: ArrayBuffer | null
+        if (helia) {
+            compressedBuffer = await get_ipns_file(url.split('/ipns/')[1])
+            if (compressedBuffer === null) {
+                log.warn('从 get_ipns_file 获取的数据为 null')
+                return null
+            }
+        } else {
+            const response = await fetch(url, {
+                signal: new AbortController().signal,
+            })
 
-        if (!response.ok) {
-            throw new Error(`${response.status} ${response.statusText}`)
+            if (!response.ok) {
+                throw new Error(`${response.status} ${response.statusText}`)
+            }
+
+            log.debug('获取 IPNS 内容:', response)
+
+            compressedBuffer = await response.arrayBuffer()
         }
 
-        log.debug('获取 IPNS 内容:', response)
-
-        const compressedBuffer = await response.arrayBuffer()
         log.debug('获取到压缩数据，大小:', compressedBuffer.byteLength, 'bytes')
 
         const decompressedBuffer = await dezstd(
@@ -32,22 +43,19 @@ export async function get_bangumi_data_from_ipns(
         log.debug('解码数据:', res)
         return res
     } catch (error) {
-        log.error('获取 IPNS 失败:', error)
+        log.error('获取 IPNS 失败:', url, error)
         return null
     }
 }
 
+/**从 Helia 或 公共网关 获取 */
 export async function get_bangumi_data_from_ipns_list(
     url_list: string[]
 ): Promise<Oidbt_ipfs_bangumi | null> {
+    await start_helia_node()
     const data_list = (
         await Promise.all(
-            url_list.map(
-                async url =>
-                    await get_bangumi_data_from_ipns(
-                        url.endsWith('/') ? url : url + '/'
-                    )
-            )
+            url_list.map(async url => await get_bangumi_data_from_ipns(url))
         )
     ).filter(v => v != null)
 

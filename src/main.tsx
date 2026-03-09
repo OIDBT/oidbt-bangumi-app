@@ -4,7 +4,7 @@ import { createApp } from 'vue'
 import App from '@/App.vue'
 import { log } from '@/log'
 
-async function run(): Promise<void> {
+async function run_oidbt_bangumi_app(): Promise<void> {
     const app = createApp(App)
     app.use(createPinia())
 
@@ -20,4 +20,4 @@ async function run(): Promise<void> {
     app.mount(target_element.appendChild(container))
 }
 
-run()
+run_oidbt_bangumi_app()

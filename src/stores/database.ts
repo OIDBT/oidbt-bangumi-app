@@ -34,7 +34,7 @@ export interface Store_setting {
 }
 
 // 封装对 setting 表的操作
-export const setting_store = {
+export const setting_db = {
     // 获取所有设置
     async getAll(): Promise<Store_setting[]> {
         const db = await db_promise

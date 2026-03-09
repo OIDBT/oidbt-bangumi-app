@@ -1,4 +1,4 @@
-name: Build and Upload to Release
+name: Release
 
 on:
   release:
@@ -6,9 +6,10 @@ on:
 
 jobs:
   build-and-upload:
+    name: Build and Upload to Release - Windows
     runs-on: windows-latest
     permissions:
-      contents: write # 需要写入权限才能上传到 release
+      contents: write
 
     steps:
       - name: Checkout code

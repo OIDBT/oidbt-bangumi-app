@@ -1,7 +1,11 @@
 const PROJECT_NAME = 'oidbt-bangumi-app'
 
-const IPNS_ADDRESS_LIST: string[] = [
-    'k51qzi5uqu5dkhdfw5qw5tb3n9fvtv026jp0c784zfpbyze22zxemll1wimnig/oidbt_ipfs_root/bangumi/',
+const BANGUMI_SOURCE_URL =
+    'https://raw.githubusercontent.com/OIDBT/oidbt-source/refs/heads/main/bangumi-source.txt'
+
+const DEFAULT_IPNS_ADDRESS_LIST = [
+    'k51qzi5uqu5dlgex0mml8heng2ymlw8ro6yf0tu664sb2lrv3539rslvud62px/oidbt_ipfs_root/bangumi/',
 ]
 
-export { IPNS_ADDRESS_LIST, PROJECT_NAME }
+export { BANGUMI_SOURCE_URL, DEFAULT_IPNS_ADDRESS_LIST, PROJECT_NAME }
+

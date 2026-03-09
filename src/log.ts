@@ -15,6 +15,9 @@ export namespace log {
     export function log(...data: any[]) {
         console.log(...log_head, ...data)
     }
+    export function warn(...data: any[]) {
+        console.warn(...log_head, ...data)
+    }
     export function error(...data: any[]) {
         console.error(...log_head, ...data)
     }
