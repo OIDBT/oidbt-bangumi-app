@@ -22,7 +22,8 @@ const mainStore = useMainStore()
 const { bangumi_source_ipns_list } = storeToRefs(mainStore)
 
 const settingStore = useSettingStore()
-const { helia_enable, trusted_source } = storeToRefs(settingStore)
+const { helia_enable, trusted_source, trusted_source_gate_list } =
+    storeToRefs(settingStore)
 
 const input_helia_enable = ref<boolean>(true)
 const input_trusted_source = ref<string>('')
@@ -61,7 +62,7 @@ onBeforeMount(cancel)
                         <n-text>添加额外信任源</n-text>
                         <n-input
                             type="textarea"
-                            :placeholder="`每条一行，# 开头为注释\ne.g.\nipns://${bangumi_source_ipns_list[0]}\ntext://${BANGUMI_SOURCE_URL}`"
+                            :placeholder="`每条一行，# 开头为注释\ne.g.\nipns://${bangumi_source_ipns_list[0]}\ntext://${BANGUMI_SOURCE_URL}\ngate://${trusted_source_gate_list[0]}`"
                             v-model:value="input_trusted_source"
                             :rows="5"
                         />
