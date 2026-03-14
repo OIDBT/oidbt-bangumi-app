@@ -31,7 +31,7 @@ export default defineConfig({
         target: 'es2024',
         outDir: 'dist',
         emptyOutDir: true,
-        minify: 'oxc',
+        minify: process.env.NODE_ENV === 'production' ? 'terser' : 'esbuild',
     },
     resolve: {
         alias: {

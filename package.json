@@ -1,6 +1,6 @@
 {
   "name": "oidbt-bangumi-app",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Bangumi 组件 《OIDBT Bangumi App》",
   "author": "op200",
   "license": "Copyright op200",
@@ -37,8 +37,9 @@
     "naive-ui": "^2.44.1",
     "npm-run-all2": "^8.0.4",
     "prettier": "^3.8.1",
+    "terser": "^5.46.0",
     "typescript": "~5.9.3",
-    "vite": "^8.0.0",
+    "vite": "^7.3.1",
     "vite-plugin-monkey": "^7.1.9",
     "vite-plugin-vue-devtools": "^8.1.0",
     "vue-tsc": "^3.2.5"
