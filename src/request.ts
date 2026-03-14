@@ -1,34 +1,56 @@
+import { storeToRefs } from 'pinia'
+
+import {
+    get_ipns_file as get_ipns_file_from_helia,
+    helia,
+    start_helia_node,
+} from '@/helia'
 import { log } from '@/log'
 import type { Magnet_item, Oidbt_ipfs_bangumi } from '@/stores/mainStore'
-import { dezstd } from '@/utils'
-import { get_ipns_file, helia, start_helia_node } from '@/helia'
+import { useSettingStore } from '@/stores/settingStore'
+import { dezstd, fetch_check } from '@/utils'
 
+/**从 Helia 和 公共网关 获取
+ * @param ipns_url - format: /ipns/.../${bangumi_id}
+ */
 export async function get_bangumi_data_from_ipns(
-    url: string
+    ipns_url: string
 ): Promise<Oidbt_ipfs_bangumi | null> {
+    const settingStore = useSettingStore()
+    const { trusted_source_gate_list } = storeToRefs(settingStore)
     try {
-        log.debug('get_bangumi_data_from_ipns', url)
+        log.debug('get_bangumi_data_from_ipns', ipns_url)
 
-        // 提前请求 HTTP
-        const response_promise = fetch(url, {
-            signal: new AbortController().signal,
-        })
+        const response_promise = (async () => {
+            const resp = await Promise.any(
+                trusted_source_gate_list.value.map(async url => {
+                    try {
+                        return await fetch_check(url + ipns_url, {
+                            signal: new AbortController().signal,
+                        })
+                    } catch (err) {
+                        log.error(err)
+                        throw err
+                    }
+                })
+            )
+            return resp.arrayBuffer()
+        })()
+        const ipns_file_promise = (async () => {
+            try {
+                return await get_ipns_file_from_helia(
+                    ipns_url.split('/ipns/')[1]
+                )
+            } catch (err) {
+                log.error(err)
+                throw err
+            }
+        })()
 
-        let compressedBuffer: ArrayBuffer | null = null
-        if (helia) {
-            compressedBuffer = await get_ipns_file(url.split('/ipns/')[1])
-            if (compressedBuffer === null)
-                log.warn('从 helia.get_ipns_file 获取的数据为 null')
-        }
-        if (compressedBuffer === null) {
-            const response = await response_promise
-            if (!response.ok)
-                throw new Error(`${response.status} ${response.statusText}`)
-
-            log.debug('HTTP 获取 IPNS 内容:', response)
-
-            compressedBuffer = await response.arrayBuffer()
-        }
+        const compressedBuffer = await Promise.any([
+            response_promise,
+            ipns_file_promise,
+        ])
 
         log.debug('获取到压缩数据，大小:', compressedBuffer.byteLength, 'bytes')
         const decompressedBuffer = await dezstd(
@@ -42,20 +64,24 @@ export async function get_bangumi_data_from_ipns(
         log.debug('解码数据:', res)
         return res
     } catch (error) {
-        log.error('获取 IPNS 失败:', url, error)
+        log.error('获取 IPNS 失败:', ipns_url, error)
         return null
     }
 }
 
-/**从 Helia 或 公共网关 获取 */
+/**从 Helia 和 公共网关 获取
+ * @param ipns_url_list - format: /ipns/.../${bangumi_id}
+ */
 export async function get_bangumi_data_from_ipns_list(
-    url_list: string[]
+    ipns_url_list: string[]
 ): Promise<Oidbt_ipfs_bangumi | null> {
     await start_helia_node()
     helia?.start()
     const data_list = (
         await Promise.all(
-            url_list.map(async url => await get_bangumi_data_from_ipns(url))
+            ipns_url_list.map(
+                async url => await get_bangumi_data_from_ipns(url)
+            )
         )
     ).filter(v => v != null)
     helia?.stop()

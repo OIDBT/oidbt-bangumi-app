@@ -31,7 +31,7 @@ export default defineConfig({
         target: 'es2024',
         outDir: 'dist',
         emptyOutDir: true,
-        minify: process.env.NODE_ENV === 'production' ? 'terser' : 'esbuild',
+        minify: 'oxc',
     },
     resolve: {
         alias: {
@@ -40,8 +40,5 @@ export default defineConfig({
     },
     optimizeDeps: {
         exclude: ['@bokuweb/zstd-wasm'],
-        esbuildOptions: {
-            target: 'es2024',
-        },
     },
 })

@@ -1,12 +1,12 @@
 import { ipns } from '@helia/ipns'
 import { unixfs } from '@helia/unixfs'
 import { peerIdFromString } from '@libp2p/peer-id'
+import { IDBBlockstore } from 'blockstore-idb'
 import { Buffer } from 'buffer'
+import { IDBDatastore } from 'datastore-idb'
 import { createHelia, type Helia } from 'helia'
 import { storeToRefs } from 'pinia'
 import { watch } from 'vue'
-import { IDBDatastore } from 'datastore-idb'
-import { IDBBlockstore } from 'blockstore-idb'
 
 import { log } from '@/log'
 import { useSettingStore } from '@/stores/settingStore'
@@ -90,13 +90,10 @@ export async function start_helia_node() {
  */
 export async function get_ipns_file(
     url: string,
-    resolveTimeout: number = 4_000,
-    fileTimeout: number = 12_000
-): Promise<ArrayBuffer | null> {
-    if (!helia) {
-        log.error('不存在 Helia 对象')
-        return null
-    }
+    resolveTimeout: number = 12_000,
+    fileTimeout: number = 120_000
+): Promise<ArrayBuffer> {
+    if (!helia) throw new Error(`不存在 Helia 对象: ${url}`)
 
     // 先声明变量，初始化为 undefined
     let resolveTimeoutId: ReturnType<typeof setTimeout> | undefined
@@ -105,7 +102,7 @@ export async function get_ipns_file(
     // IPNS解析超时 Promise
     const resolveTimeoutPromise = new Promise<never>((_, reject) => {
         resolveTimeoutId = setTimeout(() => {
-            reject(new Error(`IPNS解析超时 (${resolveTimeout}ms)`))
+            reject(new Error(`Helia IPNS 解析超时 (${resolveTimeout}ms)`))
         }, resolveTimeout)
     })
 
@@ -117,7 +114,7 @@ export async function get_ipns_file(
         let path = url.slice(ipns_id.length)
         if (path.endsWith('/')) path = path.slice(0, -1)
 
-        log.debug(`开始解析IPNS: ${ipns_id}`)
+        log.debug(`Helia 开始解析 IPNS: ${ipns_id}`)
 
         // IPNS解析带超时
         const ipns_res = (await Promise.race([
@@ -128,12 +125,12 @@ export async function get_ipns_file(
         // 清除IPNS解析超时定时器（如果存在）
         if (resolveTimeoutId) clearTimeout(resolveTimeoutId)
 
-        log.debug(`IPNS解析成功: ${ipns_res.cid}`)
+        log.debug(`Helia IPNS 解析成功: ${ipns_res.cid}`)
 
         // 文件获取超时 Promise
         const fileTimeoutPromise = new Promise<never>((_, reject) => {
             fileTimeoutId = setTimeout(() => {
-                reject(new Error(`文件获取超时 (${fileTimeout}ms)`))
+                reject(new Error(`Helia 文件获取超时 (${fileTimeout}ms)`))
             }, fileTimeout)
         })
 
@@ -154,28 +151,20 @@ export async function get_ipns_file(
         }
 
         const totalSize = chunks.reduce((acc, chunk) => acc + chunk.length, 0)
-        log.debug(`文件获取成功, 大小: ${totalSize} bytes`)
+        log.debug(`Helia 文件获取成功, 大小: ${totalSize} bytes`)
 
         return Buffer.concat(chunks).buffer
     } catch (error) {
         // 清除所有定时器（如果存在）
-        if (resolveTimeoutId) {
-            clearTimeout(resolveTimeoutId)
-        }
-        if (fileTimeoutId) {
-            clearTimeout(fileTimeoutId)
-        }
+        if (resolveTimeoutId) clearTimeout(resolveTimeoutId)
+
+        if (fileTimeoutId) clearTimeout(fileTimeoutId)
 
         // 错误处理
-        if (error instanceof Error) {
-            if (error.message.includes('超时')) {
-                log.error('get_ipns_file 超时:', error.message)
-            } else {
-                log.error('get_ipns_file 失败:', error.message)
-            }
-        } else {
-            log.error('get_ipns_file 失败:', error)
-        }
-        return null
+        let err_msg: string | undefined = undefined
+        if (error instanceof Error)
+            if (error.message.includes('超时')) err_msg = `get_ipns_file 超时`
+
+        throw new Error(err_msg ?? 'get_ipns_file 失败', { cause: error })
     }
 }

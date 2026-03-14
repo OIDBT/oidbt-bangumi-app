@@ -3,6 +3,7 @@ import { setting_db } from '@/stores/database'
 import { get_trusted_source_list_from_head } from '@/utils'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
+import { DEFAULT_GETE_ADDRESS_LIST } from '@/global_val'
 
 export const useSettingStore = defineStore('setting', () => {
     // Helia 设置
@@ -36,7 +37,10 @@ export const useSettingStore = defineStore('setting', () => {
         })
     )
 
+    /**format: abc.../oidbt_ipfs_root/bangumi/ */
     const trusted_source_ipns_list = ref<string[]>([])
+    /**format: https://ipfs.io */
+    const trusted_source_gate_list = ref<string[]>([])
     watch(trusted_source_lines, async () => {
         trusted_source_ipns_list.value = [
             ...get_trusted_source_list_from_head(
@@ -64,7 +68,20 @@ export const useSettingStore = defineStore('setting', () => {
                 )
             ).filter(v => v !== null),
         ]
+
+        trusted_source_gate_list.value = [
+            ...DEFAULT_GETE_ADDRESS_LIST,
+            ...get_trusted_source_list_from_head(
+                trusted_source_lines.value,
+                'gate://'
+            ),
+        ].map(s => (s.endsWith('/') ? s.slice(0, -1) : s))
     })
 
-    return { helia_enable, trusted_source, trusted_source_ipns_list }
+    return {
+        helia_enable,
+        trusted_source,
+        trusted_source_ipns_list,
+        trusted_source_gate_list,
+    }
 })

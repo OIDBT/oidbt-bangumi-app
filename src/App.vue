@@ -22,10 +22,7 @@ const ipfs_io_url_list = computed<string[]>(() => [
         [
             ...bangumi_source_ipns_list.value,
             ...trusted_source_ipns_list.value,
-        ].map(
-            v =>
-                `https://ipfs.io/ipns/${v}${window.location.pathname.split('/').at(-1)}`
-        )
+        ].map(v => `/ipns/${v}${window.location.pathname.split('/').at(-1)}`)
     ),
 ])
 

@@ -22,9 +22,13 @@ import { computed, ref, type StyleValue } from 'vue'
 
 import Setting from '@/components/Setting.vue'
 import { useMainStore } from '@/stores/mainStore'
+import { useSettingStore } from '@/stores/settingStore'
 
 const mainStore = useMainStore()
 const { data_from_ipfsio } = storeToRefs(mainStore)
+
+const settingStore = useSettingStore()
+const { trusted_source_ipns_list } = storeToRefs(settingStore)
 
 const wd = window
 const nav = navigator
@@ -200,11 +204,11 @@ const data_table_columns = computed<DataTableColumns<Data_table_row>>(() => [
                                     ))}
                                     <NA
                                         {...({
-                                            href: `https://ipfs.io/ipfs/${row.cid}`,
+                                            href: `${trusted_source_ipns_list.value[0]}/ipfs/${row.cid}`,
                                         } as any)}
                                         v-show={row.cid}
                                     >
-                                        https://ipfs.io/ipfs/{row.cid}
+                                        {`${trusted_source_ipns_list.value[0]}/ipfs/${row.cid}`}
                                     </NA>
                                 </NSpace>
                             ),

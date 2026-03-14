@@ -7,4 +7,7 @@ const DEFAULT_IPNS_ADDRESS_LIST = [
     'k51qzi5uqu5dlgex0mml8heng2ymlw8ro6yf0tu664sb2lrv3539rslvud62px/oidbt_ipfs_root/bangumi/',
 ]
 
-export { BANGUMI_SOURCE_URL, DEFAULT_IPNS_ADDRESS_LIST, PROJECT_NAME }
+const DEFAULT_GETE_ADDRESS_LIST = ['https://ipfs.io/']
+
+export { BANGUMI_SOURCE_URL, DEFAULT_GETE_ADDRESS_LIST, DEFAULT_IPNS_ADDRESS_LIST, PROJECT_NAME }
+
